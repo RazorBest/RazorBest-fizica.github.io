@@ -1,0 +1,313 @@
+<html>
+	<head>
+		<title>
+			Electricitate
+		</title>
+		<link rel = "stylesheet" type = "text/css" href = "/css/index.css">
+	</head>
+	
+<body>
+	<div class = "title">
+		<h1>Legea lui Ohm</h1>
+	</div>
+	<div class = "teorie">
+		<p class = "default">Legea lui Ohm sau legea conductiei electrice, stabileste legaturile între intensitatea curentului electric (I) dintr-un circuit electric, tensiunea electrica (U) aplicata si rezistenta electrica (R) din circuit.Legea lui Ohm se aplica pentru conductori electrici la capetele carora se aplica tensiuni electrice. Legea lui Ohm spune ca într-un circuit intensitatea (I) curentului electric este direct propor?ionala cu tensiunea aplicata ?i invers propor?ionala cu rezisten?a (R) din circuit.
+		</p>
+		<br>
+		<p class = "default">	Formula matematica a legii lui Ohm este:</p>
+		<p class = "formula">I = U/R</p>
+	</div>
+	<div class = "game">
+		<canvas id = "window" class = "window" border  = "1px" width = "600" height = "600">
+		</canvas>
+	</div>
+</body>
+<script>
+	var g = document.getElementById("window").getContext("2d");
+	var rezX, rezY, rezWidth, rezHeight;
+	var rezActive, dX, dY, dWidth, dHeight;
+	var slideRezX, slideRezY, dragSlideRez, slideRezLen;
+	var genX, genY, genWidth, genHeight;
+	var genActive, gX, gY, gWidth, gHeight;
+	var slideGenX, slideGenY, dragSlideGen, slideGenLen;
+	var ampX, ampY, ampWidth, ampHeight;
+	var R, U, I;
+	
+	var electroniX, electroniY, count;
+	
+	start();
+	
+	function start()
+	{
+		//rezistorul
+		rezActive = false;
+		rezX = 240;
+		rezY = 520;
+		rezWidth = 120;
+		rezHeight = 60;
+		dX = 230;
+		dY = 380;
+		dWidth = 140;
+		dHeight = 180;
+		slideRezX = dX + dWidth - 22;
+		slideRezY = dY + dHeight / 2;
+		slideRezLen = dHeight - 50;
+		R = Math.floor((dY + dHeight - 25 - slideRezY) * 9 / slideRezLen) + 1;
+		dragSlideRez = false;
+		
+		//generatorul
+		genActive = false;
+		genX = 250;
+		genY = 120;
+		genWidth = 90;
+		genHeight = 70;
+		gX = 225;
+		gY = 140;
+		gWidth = 140;
+		gHeight = 180;
+		slideGenX = gX + gWidth - 22;
+		slideGenY = gY + gHeight / 2;
+		slideGenLen = gHeight - 50;
+		U = Math.floor((gY + gHeight - 25 - slideGenY) * 9 / slideGenLen) + 1;
+		dragSlideGen = false;
+		
+		//ampermetrul
+		ampX = 53;
+		ampY = 250;
+		ampWidth = 100;
+		ampHeight = 70;
+		
+		//electronii
+		electroniX = [];
+		electroniY = [];
+		count = 0;
+		I = U / R
+		
+		setInterval(draw, 10);
+		setInterval(electricitate, 10);
+		document.getElementById("window").addEventListener("mousemove", mouse);
+		document.getElementById("window").addEventListener("mousedown", mousePressed);
+		document.getElementById("window").addEventListener("mouseup", mouseReleased);
+	}
+	
+	function electricitate()
+	{
+		var speed = (11 - R) * 0.4;
+		
+		count++;
+		if(count > ((11 - U) * 30))
+		{
+			console.log("push");
+			electroniX.push(280);
+			electroniY.push(152);
+			count = 0;
+		}
+		
+		for(var i = 0; i < electroniX.length; i++)
+		{
+			if(electroniY[i] <= 152 && electroniX[i] >= 105 && electroniX[i] <= 280)
+			{
+				electroniY[i] = 152;
+				electroniX[i] -= speed;				
+			}
+			else if(electroniX[i] < 105 && electroniY[i] <= 550)
+			{
+				electroniX[i] = 104;
+				electroniY[i] += speed;
+			}
+			else if(electroniY[i] > 550 && electroniX[i] <= 501)
+			{
+				electroniY[i] = 551;
+				electroniX[i] += speed;
+			}
+			else if(electroniX[i] > 501 && electroniY[i] >= 153)
+			{
+				electroniX[i] = 502;
+				electroniY[i] -= speed;
+			}
+			else if(electroniY[i] < 153 && electroniX[i] > 310)
+			{
+				electroniY[i] = 152;
+				electroniX[i] -= speed;
+			}
+			else
+			{
+				electroniX.splice(i, 1);
+				electroniY.splice(i, 1);
+			}
+		}
+	}
+	
+	function draw()         //asta este functia care deseneaza pe Canvas
+	{
+		g.fillStyle = "white";
+		g.strokeStyle = "black";
+		g.fillRect(0, 0, 600, 600);
+		g.fillStyle = "black";
+		g.fillRect(100, 150, 190, 5); //linia orizontala de sus - prima bucata
+		g.fillRect(302, 150, 200, 5); //linia orizaontala de sus - a doua bucata
+		g.fillRect(290, 125, 2, 50); g.fillRect(300, 137, 5, 30); //generatorul
+		g.fillRect(277, 166, 1, 15); g.fillRect(270, 173, 15, 1); //semnul +
+		g.fillRect(310, 173, 15, 1);  //semnul -
+		g.fillRect(500, 150, 5, 405); //linia verticala din dreapta
+		g.fillRect(100, 550, 400, 5); //linia orizontala de jos
+		g.fillRect(100, 150, 5, 400); //linia verticala din stanga
+		
+		g.fillStyle = "#7cb4f4";
+		g.strokeStyle = "#7cb4f4";
+		for(var i = 0; i < electroniX.length; i++)
+		{
+			g.beginPath();
+			g.arc(electroniX[i], electroniY[i], 10, 0, 2 * Math.PI);
+			g.fill();
+			g.stroke();
+		}
+		
+		g.strokeStyle = "black";
+		g.fillStyle = "white";
+		g.fillRect(rezX - R * 5, rezY, rezWidth + R * 10, rezHeight);
+		g.fillStyle = "black";
+		g.strokeRect(rezX - R * 5, rezY, rezWidth + R * 10, rezHeight);  //rezistorul
+		g.font = "40px Arial"; g.fillText("R", 285, 560); //deseneaza litera R
+		
+		g.fillStyle = "white"; 
+		g.fillRect(ampX, ampY, ampWidth, ampHeight);       
+		g.fillStyle = "black";
+		g.strokeRect(ampX, ampY, ampWidth, ampHeight);      //ampermetrul
+		var intensitate = I.toFixed(2);
+		g.font = "30px Arial"; g.fillText(intensitate + "A", ampX + 3, ampY + 50);
+		
+		if(rezActive)
+		{
+			g.strokeStyle = "black";
+			g.fillStyle = "white";
+			g.fillRect(dX, dY, dWidth, dHeight);
+			g.fillStyle = "black";
+			g.strokeRect(dX, dY, dWidth, dHeight);
+			
+			g.beginPath();
+			g.fillRect(dX + dWidth - 30, dY + 25, 1, dHeight - 50);
+			g.fillRect(dX + dWidth - 15, dY + 25, 1, dHeight - 50);
+			g.beginPath();
+			g.arc(dX + dWidth - 22, dY + 25, 7, Math.PI, 0);
+			g.stroke();
+			g.beginPath();
+			g.arc(dX + dWidth - 22, dY + dHeight - 25, 7, 0, Math.PI);
+			g.stroke();
+			
+			
+			g.fillStyle = "blue";                        //cerculetul albastru
+			g.strokeStyle = "blue";
+			g.beginPath();
+			g.arc(slideRezX, slideRezY, 12, 0, 2 * Math.PI);
+			g.fill();
+			g.stroke();
+			
+			g.fillStyle = "black";
+			g.fillText(R + "\u03A9", dX + 25, dY + 100);
+		}
+		
+		if(genActive)
+		{
+			g.strokeStyle = "black";
+			g.fillStyle = "white";
+			g.fillRect(gX, gY, gWidth, gHeight);
+			g.fillStyle = "black";
+			g.strokeRect(gX, gY, gWidth, gHeight);
+			
+			g.beginPath();
+			g.fillRect(gX + gWidth - 30, gY + 25, 1, gHeight - 50);
+			g.fillRect(gX + gWidth - 15, gY + 25, 1, gHeight - 50);
+			g.beginPath();
+			g.arc(gX + gWidth - 22, gY + 25, 7, Math.PI, 0);
+			g.stroke();
+			g.beginPath();
+			g.arc(gX + gWidth - 22, gY + gHeight - 25, 7, 0, Math.PI);
+			g.stroke();
+			
+			
+			g.fillStyle = "blue";                        //cerculetul albastru
+			g.strokeStyle = "blue";
+			g.beginPath();
+			g.arc(slideGenX, slideGenY, 12, 0, 2 * Math.PI);
+			g.fill();
+			g.stroke();
+			
+			g.fillStyle = "black";
+			g.fillText(U + "V", gX + 25, gY + 100);
+		}
+	}
+	function mouse(event)
+	{
+		var x = event.offsetX;
+		var y = event.offsetY;
+		
+		//rezistor
+		if(rezActive && dragSlideRez)
+		{
+			if(y >= dY + 25 && y <= dY + dHeight - 25)
+			{
+				slideRezY = y;
+				R = Math.floor((dY + dHeight - 25 - slideRezY) * 9 / slideRezLen) + 1;
+				I = U / R;
+			}
+		}
+		if(x >= rezX - R * 5 && x <= rezX + rezWidth + R * 5 && y >= rezY && y <= rezY + rezHeight)
+		{
+			rezActive = true;
+		}
+		else if(rezActive && (x < dX || x > dX + dWidth || y < dY || y > dY + dHeight))
+		{
+			rezActive = false;
+			dragSlide = false;
+		}
+		
+		//generator
+		if(genActive && dragSlideGen)
+		{
+			if(y >= gY + 25 && y <= gY + gHeight - 25)
+			{
+				slideGenY = y;
+				U = Math.floor((gY + gHeight - 25 - slideGenY) * 9 / slideGenLen) + 1;
+				I = U / R;
+			}
+		}
+		if(x >= genX && x <= genX + genWidth && y >= genY && y <= genY + genHeight)
+		{
+			genActive = true;
+		}
+		else if(genActive && (x < gX || x > gX + gWidth || y < gY || y > gY + gHeight))
+		{
+			genActive = false;
+		}
+	}
+	function mousePressed(event)
+	{
+		var x = event.offsetX;
+		var y = event.offsetY;
+		if(rezActive)
+		{
+			var d = Math.sqrt(((x - slideRezX) * (x - slideRezX) + (y - slideRezY) * (y - slideRezY)));
+			if(d <= 12) //raza cerculetului albastru
+			{
+				dragSlideRez = true;
+			}
+		}
+		if(genActive)
+		{
+			var d = Math.sqrt(((x - slideGenX) * (x - slideGenX) + (y - slideGenY) * (y - slideGenY)));
+			if(d <= 12) //raza cerculetului albastru
+			{
+				dragSlideGen = true;
+			}
+		}
+	}
+	function mouseReleased(event)
+	{
+		if(dragSlideRez)
+			dragSlideRez = false;
+		if(dragSlideGen)
+			dragSlideGen = false;
+	}
+</script>
+</html>
